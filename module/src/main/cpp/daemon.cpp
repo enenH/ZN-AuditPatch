@@ -26,20 +26,23 @@ static bool initialize_cgroup() {
     }
     if (cgroup_root.empty()) return false;
 
-    DIR *dir = opendir((cgroup_root + "/uid_0").c_str());
-    if (!dir) return false;
-    bool found = false;
-    while (auto *entry = readdir(dir)) {
-        if (strncmp(entry->d_name, "pid_", 4) == 0) {
-            found = true;
-            break;
+    for (const char *uid_dir : {"/uid_0", "/uid_2000"}) {
+        DIR *dir = opendir((cgroup_root + uid_dir).c_str());
+        if (!dir) continue;
+        bool found = false;
+        while (auto *entry = readdir(dir)) {
+            if (strncmp(entry->d_name, "pid_", 4) == 0) {
+                found = true;
+                break;
+            }
         }
+        closedir(dir);
+        if (found) return true;
     }
-    closedir(dir);
-    return found;
+    return false;
 }
 
-static bool is_root_context(pid_t pid, char *context) {
+static bool is_target_context(pid_t pid, char *context) {
     char path[PATH_MAX];
     snprintf(path, sizeof(path), "/proc/%d", pid);
     auto len = getxattr(path, "security.selinux", context, PATH_MAX - 1);
@@ -47,7 +50,8 @@ static bool is_root_context(pid_t pid, char *context) {
     context[len] = '\0';
     return strcmp(context, "u:r:su:s0") == 0 ||
            strcmp(context, "u:r:ksu:s0") == 0 ||
-           strcmp(context, "u:r:magisk:s0") == 0;
+           strcmp(context, "u:r:magisk:s0") == 0 ||
+           strcmp(context, "u:r:shell:s0") == 0;
 }
 
 static void remove_cgroup(pid_t pid) {
@@ -114,7 +118,7 @@ static void scan_processes() {
         long pid = strtol(entry->d_name, &end, 10);
         if (!entry->d_name[0] || *end || pid <= 0) continue;
         char context[PATH_MAX];
-        if (is_root_context(static_cast<pid_t>(pid), context)) {
+        if (is_target_context(static_cast<pid_t>(pid), context)) {
             create_cgroup(static_cast<pid_t>(pid));
         }
     }
@@ -124,7 +128,7 @@ static void scan_processes() {
 static void check_process(pid_t pid) {
     char context[PATH_MAX];
     for (int attempt = 0; attempt < 3; ++attempt) {
-        if (is_root_context(pid, context)) {
+        if (is_target_context(pid, context)) {
             create_cgroup(pid);
             return;
         }
@@ -150,7 +154,7 @@ static void on_fork(pid_t parent, pid_t child) {
     fclose(file);
     if (tgid != child) return;
     char context[PATH_MAX];
-    if (is_root_context(parent, context)) check_process(child);
+    if (is_target_context(parent, context)) check_process(child);
 }
 
 static void on_exit(pid_t pid, pid_t tid) {

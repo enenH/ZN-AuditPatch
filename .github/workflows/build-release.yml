@@ -54,6 +54,12 @@ jobs:
             "-PreleaseVersionCode=$((18 + GITHUB_RUN_NUMBER))" \
             "-PreleaseCommitHash=${GITHUB_SHA:0:7}"
 
+      - name: Verify shell context handling
+        run: |
+          python3 -m venv "$RUNNER_TEMP/auditpatch-tests"
+          "$RUNNER_TEMP/auditpatch-tests/bin/python" -m pip install --disable-pip-version-check -r tests/requirements.txt
+          "$RUNNER_TEMP/auditpatch-tests/bin/python" -m unittest discover -s tests -p test_shell_context.py -v
+
       - name: Prepare release assets
         id: package
         run: |

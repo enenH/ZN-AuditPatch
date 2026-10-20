@@ -1,29 +1,17 @@
 import com.android.build.gradle.AppExtension
-import java.io.ByteArrayOutputStream
 
 plugins {
     alias(libs.plugins.agp.app) apply false
 }
 
-fun String.execute(currentWorkingDir: File = file("./")): String {
-    val byteOut = ByteArrayOutputStream()
-    project.exec {
-        workingDir = currentWorkingDir
-        commandLine = split("\\s".toRegex())
-        standardOutput = byteOut
-    }
-    return String(byteOut.toByteArray()).trim()
-}
-
-val gitCommitCount = "git rev-list HEAD --count".execute().toInt()
-val gitCommitHash = "git rev-parse --verify --short HEAD".execute()
-
 // also the soname
 val moduleId by extra("auditpatch")
 val moduleName by extra("ZN - Audit Patch")
-val verName by extra("v1.1.3")
-val verCode by extra(gitCommitCount)
-val commitHash by extra(gitCommitHash)
+val verName by extra("v1.2.0")
+// Preserve the recovered release identity without rewriting Git history.
+// Pass -PreleaseVersionCode=... and -PreleaseCommitHash=... for subsequent builds.
+val verCode by extra(providers.gradleProperty("releaseVersionCode").orElse("18").get().toInt())
+val commitHash by extra(providers.gradleProperty("releaseCommitHash").orElse("4d8d26d").get())
 val abiList by extra(listOf("arm64-v8a", "x86_64"))
 
 val androidMinSdkVersion by extra(26)

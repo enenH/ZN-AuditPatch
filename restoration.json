@@ -1,0 +1,136 @@
+{
+  "reference": {
+    "filename": "ZN---Audit-Patch-v1.2.0-18-4d8d26d-release (1).zip",
+    "sha256": "13eba068eda95b1f98f5ada67f2aaf90a7acbddf15992f1c1d8954c5ac6aca95",
+    "version": "v1.2.0",
+    "version_code": 18,
+    "commit_label": "4d8d26d"
+  },
+  "recovery": {
+    "base_git_commit": "96a51073e5d2afb014e11511fdc754dc49daae65",
+    "method": "Existing hook source plus IDA decompilation of the supplied ARM64 libraries; scripts recovered from the ZIP.",
+    "limits": "The 4d8d26d Git object was not available. The daemon is reconstructed C++ source, not the original source text or a byte-identical binary. No Android device runtime validation was performed.",
+    "git_history_rewritten": false
+  },
+  "toolchain": {
+    "gradle": "8.10.1",
+    "agp": "8.6.1",
+    "jdk": 21,
+    "ndk": "27.1.12297006",
+    "cmake": "3.22.1",
+    "android_api": 26,
+    "stl": "c++_static",
+    "elf_page_alignment": 16384,
+    "abis": [
+      "arm64-v8a",
+      "x86_64"
+    ]
+  },
+  "build": {
+    "command": ".\\gradlew.bat :module:zipRelease",
+    "output": "module/release/ZN---Audit-Patch-v1.2.0-18-4d8d26d-release.zip",
+    "sha256": "a9c827f0e46d0f07773da5f5d00eaccf62e9cbf7bac5d501917c919ef9b6326c",
+    "metadata_overrides": [
+      "-PreleaseVersionCode=...",
+      "-PreleaseCommitHash=..."
+    ]
+  },
+  "verification": {
+    "package_file_sets_identical": true,
+    "all_15_payload_checksums_valid": true,
+    "byte_identical_text_files": [
+      "META-INF/com/google/android/update-binary",
+      "META-INF/com/google/android/updater-script",
+      "README.md",
+      "customize.sh",
+      "daemon.sh",
+      "module.prop",
+      "post-fs-data.sh",
+      "service.sh",
+      "uninstall.sh",
+      "verify.sh",
+      "zn_modules.txt"
+    ],
+    "arm64_hook_cases": 13,
+    "arm64_daemon_lifecycle_effects": 44,
+    "arm64_monitor_scenarios": 9,
+    "arm64_startup_scenarios": 6,
+    "arm64_initial_scan_effects": 22,
+    "harness": "tests/compare_release.py",
+    "dependencies": "tests/requirements.txt"
+  },
+  "binaries": [
+    {
+      "path": "lib/arm64/libauditpatch.so",
+      "reference_sha256": "b0221b5ebbf42d8ed56b26d179bc276d1d3ddd52b31bb1f345f56cb82eb7197c",
+      "rebuilt_sha256": "8737c1f7e90b06b86d915a51e50f38fea1a1e562a4cec0680e819031fac37a3b",
+      "reference_size": 5792,
+      "rebuilt_size": 5792,
+      "identical_runtime_sections_except_build_id": [
+        ".note.android.ident",
+        ".dynsym",
+        ".gnu.version",
+        ".gnu.version_r",
+        ".gnu.hash",
+        ".dynstr",
+        ".rela.dyn",
+        ".rela.plt",
+        ".rodata",
+        ".eh_frame_hdr",
+        ".eh_frame",
+        ".text",
+        ".plt",
+        ".data.rel.ro",
+        ".fini_array",
+        ".dynamic",
+        ".got.plt",
+        ".relro_padding",
+        ".data",
+        ".bss"
+      ]
+    },
+    {
+      "path": "lib/arm64/libdaemon.so",
+      "reference_sha256": "1229cb33a925a4dc49494da30b784cccb676c1217796784f615d4031876bbed5",
+      "rebuilt_sha256": "5a3cbf3ba6b5427cf1e096975d7f3826d66702d187f38be45fe319d101fc6b59",
+      "reference_size": 243144,
+      "rebuilt_size": 241944
+    },
+    {
+      "path": "lib/x64/libauditpatch.so",
+      "reference_sha256": "dccb888760c6e0de6062914882444906e7752b1dadd193bd885534f124fee75c",
+      "rebuilt_sha256": "2176aec08cdd193a829f174f3bce45b3745653c83ed2baa71c74d3a2beab5622",
+      "reference_size": 5696,
+      "rebuilt_size": 5696,
+      "identical_runtime_sections_except_build_id": [
+        ".note.android.ident",
+        ".dynsym",
+        ".gnu.version",
+        ".gnu.version_r",
+        ".gnu.hash",
+        ".dynstr",
+        ".rela.dyn",
+        ".rela.plt",
+        ".rodata",
+        ".eh_frame_hdr",
+        ".eh_frame",
+        ".text",
+        ".plt",
+        ".data.rel.ro",
+        ".fini_array",
+        ".dynamic",
+        ".got.plt",
+        ".relro_padding",
+        ".data",
+        ".bss"
+      ]
+    },
+    {
+      "path": "lib/x64/libdaemon.so",
+      "reference_sha256": "d59362b4575fd0da2fdcd57adb5f306dcf097df6db10bd83179c2a81c7e2e0fd",
+      "rebuilt_sha256": "a934f69aadb40bebf1c8837112c0b0193064f12faef6949f094e6e7c54017d79",
+      "reference_size": 236216,
+      "rebuilt_size": 235304
+    }
+  ]
+}

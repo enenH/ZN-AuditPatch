@@ -15,9 +15,6 @@ val commitHash: String by rootProject.extra
 val abiList: List<String> by rootProject.extra
 
 android {
-    buildFeatures {
-        prefab = true
-    }
     defaultConfig {
         ndk {
             abiFilters.addAll(abiList)
@@ -25,8 +22,10 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags("-std=c++20")
+                targets.addAll(listOf(moduleId, "daemon"))
                 arguments(
-                    "-DANDROID_STL=none",
+                    "-DANDROID_STL=c++_static",
+                    "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON",
                     "-DMODULE_NAME=$moduleId"
                 )
             }
@@ -67,11 +66,22 @@ androidComponents.onVariants { variant ->
         val prepareModuleFilesTask = task<Sync>("prepareModuleFiles$variantCapped") {
             group = "module"
             dependsOn("assemble$variantCapped")
+            inputs.properties(
+                mapOf(
+                    "moduleId" to moduleId,
+                    "moduleName" to moduleName,
+                    "versionName" to verName,
+                    "versionCode" to verCode,
+                    "commitHash" to commitHash,
+                    "variantName" to variantLowered,
+                    "supportedAbis" to supportedAbis
+                )
+            )
             into(moduleDir)
             from(rootProject.layout.projectDirectory.file("README.md"))
             from(layout.projectDirectory.file("template")) {
                 exclude("module.prop", "customize.sh", "post-fs-data.sh", "service.sh", "zn_modules.txt")
-                filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"))
+                filter<FixCrLfFilter>("eol" to FixCrLfFilter.CrLf.newInstance("lf"), "fixlast" to false)
             }
             from(layout.projectDirectory.file("template")) {
                 include("module.prop", "zn_modules.txt")
@@ -163,8 +173,4 @@ androidComponents.onVariants { variant ->
             commandLine("adb", "reboot")
         }
     }
-}
-
-dependencies {
-    implementation(libs.cxx)
 }

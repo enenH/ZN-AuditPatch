@@ -3,6 +3,3 @@ agp = "8.6.1"
 
 [plugins]
 agp-app = { id = "com.android.application", version.ref = "agp" }
-
-[libraries]
-cxx = { module = "org.lsposed.libcxx:libcxx", version = "27.0.12077973" }

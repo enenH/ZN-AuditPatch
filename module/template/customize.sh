@@ -51,16 +51,26 @@ fi
 . "$TMPDIR/verify.sh"
 extract "$ZIPFILE" 'customize.sh'  "$TMPDIR/.vunzip"
 extract "$ZIPFILE" 'verify.sh'     "$TMPDIR/.vunzip"
-extract "$ZIPFILE" 'sepolicy.rule' "$TMPDIR"
 
 ui_print "- Extracting module files"
 extract "$ZIPFILE" 'module.prop'     "$MODPATH"
 extract "$ZIPFILE" 'post-fs-data.sh' "$MODPATH"
 extract "$ZIPFILE" 'service.sh'      "$MODPATH"
+extract "$ZIPFILE" 'uninstall.sh'    "$MODPATH"
 extract "$ZIPFILE" 'zn_modules.txt'  "$MODPATH"
-mv "$TMPDIR/sepolicy.rule" "$MODPATH"
 
+mkdir "$MODPATH/bin"
 mkdir "$MODPATH/lib"
+mkdir -p /data/adb/post-fs-data.d
 
 ui_print "- Extracting $ARCH libraries"
+extract "$ZIPFILE" "lib/$ARCH/libdaemon.so" "$MODPATH/bin" true
+mv "$MODPATH/bin/libdaemon.so" "$MODPATH/bin/daemon"
 extract "$ZIPFILE" "lib/$ARCH/lib$SONAME.so" "$MODPATH/lib" true
+extract "$ZIPFILE" "daemon.sh" "/data/adb/post-fs-data.d" true
+mv "/data/adb/post-fs-data.d/daemon.sh" "/data/adb/post-fs-data.d/auditpatch.sh"
+
+ui_print "- Setting permissions"
+set_perm_recursive "$MODPATH" 0 0 0755 0644
+set_perm_recursive "$MODPATH/bin" 0 0 0755 0755
+set_perm /data/adb/post-fs-data.d/auditpatch.sh 0 0 0755

@@ -2,7 +2,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdarg>
-#include <vector>
+#include <string_view>
 #include <link.h>
 #include <sys/auxv.h>
 #include "zygisk_next_api.h"
@@ -30,10 +30,10 @@ static int my_vasprintf(char **strp, const char *fmt, va_list ap) {
     auto result = old_vasprintf(strp, fmt, ap);
 
     if (result > 0 && *strp) {
-        // https://cs.android.com/android/platform/superproject/main/+/main:external/selinux/libselinux/src/android/android_seapp.c;l=694
-        constexpr std::string_view target_context = "tcontext=u:r:priv_app:s0:c512,c768";
+        constexpr std::string_view target_context = "tcontext=u:r:system_server:s0";
         constexpr std::string_view source_contexts[] = {
                 "tcontext=u:r:su:s0",
+                "tcontext=u:r:ksu:s0",
                 "tcontext=u:r:magisk:s0"
         };
 
